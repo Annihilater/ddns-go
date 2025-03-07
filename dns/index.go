@@ -3,9 +3,8 @@ package dns
 import (
 	"time"
 
-	"github.com/jeessy2/ddns-go/v5/config"
-	"github.com/jeessy2/ddns-go/v5/dns/internal"
-	"github.com/jeessy2/ddns-go/v5/util"
+	"github.com/jeessy2/ddns-go/v6/config"
+	"github.com/jeessy2/ddns-go/v6/util"
 )
 
 // DNS interface
@@ -16,17 +15,18 @@ type DNS interface {
 }
 
 var (
-	addresses = []string{
+	Addresses = []string{
 		alidnsEndpoint,
 		baiduEndpoint,
 		zonesAPI,
 		recordListAPI,
-		googleDomainEndpoint,
 		huaweicloudEndpoint,
 		nameCheapEndpoint,
 		nameSiloListRecordEndpoint,
 		porkbunEndpoint,
 		tencentCloudEndPoint,
+		dynadotEndpoint,
+		dynv6Endpoint,
 	}
 
 	Ipcache = [][2]util.IpCache{}
@@ -34,8 +34,6 @@ var (
 
 // RunTimer 定时运行
 func RunTimer(delay time.Duration) {
-	internal.WaitForNetworkConnected(addresses)
-
 	for {
 		RunOnce()
 		time.Sleep(delay)
@@ -62,6 +60,8 @@ func RunOnce() {
 			dnsSelected = &Alidns{}
 		case "tencentcloud":
 			dnsSelected = &TencentCloud{}
+		case "trafficroute":
+			dnsSelected = &TrafficRoute{}
 		case "dnspod":
 			dnsSelected = &Dnspod{}
 		case "cloudflare":
@@ -76,12 +76,16 @@ func RunOnce() {
 			dnsSelected = &Porkbun{}
 		case "godaddy":
 			dnsSelected = &GoDaddyDNS{}
-		case "googledomain":
-			dnsSelected = &GoogleDomain{}
 		case "namecheap":
 			dnsSelected = &NameCheap{}
 		case "namesilo":
 			dnsSelected = &NameSilo{}
+		case "vercel":
+			dnsSelected = &Vercel{}
+		case "dynadot":
+			dnsSelected = &Dynadot{}
+		case "dynv6":
+			dnsSelected = &Dynv6{}
 		default:
 			dnsSelected = &Alidns{}
 		}
@@ -99,5 +103,4 @@ func RunOnce() {
 	}
 
 	util.ForceCompareGlobal = false
-
 }
